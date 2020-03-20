@@ -1,7 +1,7 @@
 {
-  "name": "lvcommerce-frontend",
+  "name": "lvstore-frontend",
   "version": "1.0.0",
-  "description": "LVcommerce! An project to practice React, GraphQL, Next and Apollo",
+  "description": "lvstore! An project to practice React, GraphQL, Next and Apollo",
   "main": "index.js",
   "scripts": {
     "dev": "next -p 7777",
