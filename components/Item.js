@@ -25,7 +25,7 @@ export default class Item extends Component {
               pathname: '/item',
               query: { id: item.id }
             }}>
-            {item.title}
+            <a>{item.title}</a>
           </Link>
         </Title>
         <PriceTag>{formatMoney(item.price)}</PriceTag>
