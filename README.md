@@ -43,4 +43,4 @@ TODO
 
 - [ ] Update react to 16.8+ and update to react hooks components
 - [ ] Update style and insert Material UI Style
-- [ ] Add tests with enzyme
+- [x] Add tests with Jest and Enzyme
