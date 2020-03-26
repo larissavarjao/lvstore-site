@@ -5,7 +5,7 @@ import gql from 'graphql-tag';
 import Form from './styles/Form';
 import Error from './ErrorMessage';
 
-const REQUEST_RESET_MUTATION = gql`
+export const REQUEST_RESET_MUTATION = gql`
   mutation REQUEST_RESET_MUTATION($email: String!) {
     requestReset(email: $email) {
       message
@@ -28,6 +28,7 @@ class RequestReset extends Component {
         {(requestReset, { error, loading, called }) => (
           <Form
             method='post'
+            data-test='form'
             onSubmit={async e => {
               e.preventDefault();
               await requestReset();
@@ -37,7 +38,7 @@ class RequestReset extends Component {
               <h2>Sign in with your account</h2>
               <Error error={error} />
               {!error && !loading && called && (
-                <p>Sucess! Check your email for a reset link!</p>
+                <p>Success! Check your email for a reset link!</p>
               )}
               <label htmlFor='email'>
                 Email
