@@ -3,7 +3,7 @@ import { Mutation } from 'react-apollo';
 import gql from 'graphql-tag';
 import { CURRENT_USER_QUERY } from './User';
 
-const ADD_CART_ITEM_MUTATION = gql`
+export const ADD_CART_ITEM_MUTATION = gql`
   mutation ADD_CART_ITEM_MUTATION($id: ID!) {
     addCartItem(id: $id) {
       id
