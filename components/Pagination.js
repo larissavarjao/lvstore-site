@@ -7,7 +7,7 @@ import Link from 'next/link';
 import PaginationStyle from './styles/PaginationStyles';
 import { perPage } from '../config';
 
-const PAGINATION_QUERY = gql`
+export const PAGINATION_QUERY = gql`
   query PAGINATION_QUERY {
     itemsConnection {
       aggregate {
@@ -20,12 +20,15 @@ const PAGINATION_QUERY = gql`
 const Pagination = props => (
   <Query query={PAGINATION_QUERY}>
     {({ data, loading, error }) => {
+      if (loading) return <p>Loading...</p>;
+      if (error) return <Error error={error} />;
+
       const count = data.itemsConnection.aggregate.count;
       const pages = Math.ceil(count / perPage);
       const page = props.page;
 
       return (
-        <PaginationStyle>
+        <PaginationStyle data-test='pagination'>
           <Head>
             <title>
               LV Store | Page {page} of {pages}
@@ -39,7 +42,7 @@ const Pagination = props => (
             </a>
           </Link>
           <p>
-            Page {page} of {pages}
+            Page {page} of <span className='totalPages'>{pages}</span>!
           </p>
           <p>{count} Items Total</p>
           <Link
