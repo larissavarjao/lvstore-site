@@ -14,7 +14,7 @@ const totalItems = cart => {
   return cart.reduce((tally, cartItem) => tally + cartItem.quantity, 0);
 };
 
-const CREATE_ORDER_MUTATION = gql`
+export const CREATE_ORDER_MUTATION = gql`
   mutation CREATE_ORDER_MUTATION($token: String!) {
     createOrder(token: $token) {
       id
@@ -39,7 +39,6 @@ class TakeMyMoney extends React.Component {
       alert(err.message);
     });
 
-    console.log({ order });
     Router.push({
       pathname: '/order',
       query: { id: order.data.createOrder.id }
@@ -49,27 +48,30 @@ class TakeMyMoney extends React.Component {
   render() {
     return (
       <User>
-        {({ data: { me } }) => (
-          <Mutation
-            mutation={CREATE_ORDER_MUTATION}
-            refetchQueries={[{ query: CURRENT_USER_QUERY }]}>
-            {createOrder => (
-              <StripeCheckout
-                amout={calcTotalPrice(me.cart)}
-                name='LV Store'
-                description={`Orders of ${totalItems(me.cart)} items!`}
-                image={
-                  me.cart.length && me.cart[0].item && me.cart[0].item.image
-                }
-                stripeKey='pk_test_FW9R628pyc9fBqw7T9hgivJW009LIXn3Jk'
-                currency='USD'
-                email={me.email}
-                token={res => this.onToken(res, createOrder)}>
-                {this.props.children}
-              </StripeCheckout>
-            )}
-          </Mutation>
-        )}
+        {({ data: { me }, loading }) => {
+          if (loading) return null;
+          return (
+            <Mutation
+              mutation={CREATE_ORDER_MUTATION}
+              refetchQueries={[{ query: CURRENT_USER_QUERY }]}>
+              {createOrder => (
+                <StripeCheckout
+                  amout={calcTotalPrice(me.cart)}
+                  name='LV Store'
+                  description={`Orders of ${totalItems(me.cart)} items!`}
+                  image={
+                    me.cart.length && me.cart[0].item && me.cart[0].item.image
+                  }
+                  stripeKey='pk_test_FW9R628pyc9fBqw7T9hgivJW009LIXn3Jk'
+                  currency='USD'
+                  email={me.email}
+                  token={res => this.onToken(res, createOrder)}>
+                  {this.props.children}
+                </StripeCheckout>
+              )}
+            </Mutation>
+          );
+        }}
       </User>
     );
   }
