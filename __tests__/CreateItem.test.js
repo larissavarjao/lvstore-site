@@ -8,7 +8,6 @@ import { fakeItem } from '../lib/testUtils';
 
 const dogImage = 'https://dog.com/dog.jpg';
 
-// mock the global fetch API
 global.fetch = jest.fn().mockResolvedValue({
   json: () => ({
     secure_url: dogImage,
