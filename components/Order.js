@@ -5,10 +5,9 @@ import { format } from 'date-fns';
 import Head from 'next/head';
 import gql from 'graphql-tag';
 import formatMoney from '../lib/formatMoney';
-import OrderStyled from './styles/OrderStyles';
 import OrderStyles from './styles/OrderStyles';
 
-const SINGLE_ORDER_QUERY = gql`
+export const SINGLE_ORDER_QUERY = gql`
   query SINGLE_ORDER_QUERY($id: ID!) {
     order(id: $id) {
       id
@@ -44,7 +43,7 @@ class Order extends Component {
           const order = data.order;
 
           return (
-            <OrderStyles>
+            <OrderStyles data-test='order'>
               <Head>
                 <title>LV Store | Order {order.id}</title>
               </Head>
