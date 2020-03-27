@@ -20,9 +20,6 @@ export const CURRENT_USER_QUERY = gql`
           description
         }
       }
-      orders {
-        id
-      }
     }
   }
 `;
