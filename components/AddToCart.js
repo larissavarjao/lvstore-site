@@ -12,13 +12,16 @@ export const ADD_CART_ITEM_MUTATION = gql`
   }
 `;
 
-export const AddToCart = ({ id }) => {
+const AddToCart = ({ id }) => {
   const [addToCart, { loading }] = useMutation(ADD_CART_ITEM_MUTATION, {
     refetchQueries: [{ query: CURRENT_USER_QUERY }]
   });
+
   return (
     <button disabled={loading} onClick={() => addToCart({ variables: { id } })}>
       Add{loading && 'ing'} To Cart!
     </button>
   );
 };
+
+export default AddToCart;
