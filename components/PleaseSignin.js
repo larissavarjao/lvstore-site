@@ -1,23 +1,20 @@
-import { Query } from 'react-apollo';
-import { CURRENT_USER_QUERY } from './User';
+import { useQuery } from '@apollo/react-hooks';
 import Signin from './Signin';
+import { CURRENT_USER_QUERY } from './User';
 
-const PleaseSignIn = props => (
-  <Query query={CURRENT_USER_QUERY}>
-    {({ data, loading }) => {
-      if (loading) return <p>Loading</p>;
-      if (!data.me) {
-        return (
-          <div>
-            <p>Please Sign In before Continuing</p>
-            <Signin />
-          </div>
-        );
-      }
+const PleaseSignIn = props => {
+  const { data, loading } = useQuery(CURRENT_USER_QUERY);
+  if (loading) return <p>Loading...</p>;
+  if (!data.me) {
+    return (
+      <div>
+        <p>Please Sign In before Continuing</p>
+        <Signin />
+      </div>
+    );
+  }
 
-      return props.children;
-    }}
-  </Query>
-);
+  return props.children;
+};
 
 export default PleaseSignIn;
