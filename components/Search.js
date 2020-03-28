@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import DownShift, { resetIdCounter } from 'downshift';
 import Router from 'next/router';
 import { ApolloConsumer } from 'react-apollo';
@@ -32,77 +32,74 @@ function routeToItem(item) {
   });
 }
 
-class AutoComplete extends React.Component {
-  state = {
-    items: [],
-    loading: false
-  };
+const AutoComplete = () => {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  onChange = debounce(async (e, client) => {
-    this.setState({ loading: true });
+  const onChange = debounce(async (e, client) => {
+    setLoading(true);
 
     const res = await client.query({
       query: SEARCH_ITEMS_QUERY,
       variables: { searchTerm: e.target.value }
     });
 
-    this.setState({ items: res.data.items, loading: false });
+    setItems(res.data.items);
+    setLoading(false);
   }, 350);
 
-  render() {
-    resetIdCounter();
+  resetIdCounter();
 
-    return (
-      <SearchStyles>
-        <DownShift
-          onChange={routeToItem}
-          itemToString={item => (item === null ? '' : item.title)}>
-          {({
-            getInputProps,
-            getItemProps,
-            isOpen,
-            inputValue,
-            highlightedIndex
-          }) => (
-            <div>
-              <ApolloConsumer>
-                {client => (
-                  <input
-                    {...getInputProps({
-                      onChange: e => {
-                        e.persist();
-                        this.onChange(e, client);
-                      },
-                      type: 'search',
-                      placeholder: 'Search for an item',
-                      id: 'search',
-                      className: this.state.loading ? 'loading' : ''
-                    })}
-                  />
-                )}
-              </ApolloConsumer>
-              {isOpen && (
-                <DropDown>
-                  {this.state.items.map((item, index) => (
-                    <DropDownItem
-                      {...getItemProps({ item })}
-                      key={item.id}
-                      highlighted={index === highlightedIndex}>
-                      <img width='50' src={item.image} alt={item.title} />
-                      {item.title}
-                    </DropDownItem>
-                  ))}
-                  {!this.state.items.length && !this.state.loading && (
-                    <DropDownItem>{`Nothing found for ${inputValue}`}</DropDownItem>
-                  )}
-                </DropDown>
+  return (
+    <SearchStyles>
+      <DownShift
+        onChange={routeToItem}
+        itemToString={item => (item === null ? '' : item.title)}>
+        {({
+          getInputProps,
+          getItemProps,
+          isOpen,
+          inputValue,
+          highlightedIndex
+        }) => (
+          <div>
+            <ApolloConsumer>
+              {client => (
+                <input
+                  {...getInputProps({
+                    onChange: e => {
+                      e.persist();
+                      onChange(e, client);
+                    },
+                    type: 'search',
+                    placeholder: 'Search for an item',
+                    id: 'search',
+                    className: loading ? 'loading' : ''
+                  })}
+                />
               )}
-            </div>
-          )}
-        </DownShift>
-      </SearchStyles>
-    );
-  }
-}
+            </ApolloConsumer>
+            {isOpen && (
+              <DropDown>
+                {items.map((item, index) => (
+                  <DropDownItem
+                    {...getItemProps({ item })}
+                    key={item.id}
+                    highlighted={index === highlightedIndex}>
+                    <img width='50' src={item.image} alt={item.title} />
+                    {item.title}
+                  </DropDownItem>
+                ))}
+                {!items.length && !loading && (
+                  <DropDownItem>{`Nothing found for ${inputValue}`}</DropDownItem>
+                )}
+              </DropDown>
+            )}
+          </div>
+        )}
+      </DownShift>
+    </SearchStyles>
+  );
+};
 
 export default AutoComplete;
