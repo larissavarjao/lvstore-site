@@ -1,9 +1,8 @@
-import React, { Component } from 'react';
-import { Mutation, Query } from 'react-apollo';
+import React, { useState } from 'react';
+import { useMutation, useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import Form from './styles/Form';
 import Error from './ErrorMessage';
-import Router from 'next/router';
 
 export const SINGLE_ITEM_QUERY = gql`
   query SINGLE_ITEM_QUERY($id: ID!) {
@@ -36,84 +35,80 @@ export const UPDATE_ITEM_MUTATION = gql`
   }
 `;
 
-class UpdateItem extends Component {
-  state = {};
+const UpdateItem = ({ id }) => {
+  const {
+    data: { item },
+    loading: loadingItem
+  } = useQuery(SINGLE_ITEM_QUERY, {
+    variables: { id }
+  });
 
-  handleChange = e => {
-    const { name, type, value } = e.target;
-    const val = type === 'number' ? parseFloat(value) : value;
+  if (loadingItem) return <p>Loading...</p>;
+  if (!item) return <p>No Item Found for ID</p>;
 
-    this.setState({ [name]: val });
-  };
+  const [updateItem, { loading, error }] = useMutation(UPDATE_ITEM_MUTATION);
 
-  updateItem = async (e, updateItemMutation) => {
+  const update = async (e, updateItemMutation) => {
     e.preventDefault();
 
     const res = await updateItemMutation({
       variables: {
-        id: this.props.id,
-        ...this.state
+        id: id,
+        title,
+        description,
+        price
       }
     });
   };
 
-  render() {
-    return (
-      <Query query={SINGLE_ITEM_QUERY} variables={{ id: this.props.id }}>
-        {({ data, loading }) => {
-          if (loading) return <p>Loading...</p>;
-          if (!data.item) return <p>No Item Found for ID</p>;
-          return (
-            <Mutation mutation={UPDATE_ITEM_MUTATION} variables={this.state}>
-              {(updateItem, { loading, error }) => (
-                <Form onSubmit={e => this.updateItem(e, updateItem)}>
-                  <Error error={error} />
-                  <fieldset disabled={loading} aria-busy={loading}>
-                    <label htmlFor='title'>
-                      Title
-                      <input
-                        type='text'
-                        id='title'
-                        name='title'
-                        placeholder='Title'
-                        required
-                        defaultValue={data.item.title}
-                        onChange={this.handleChange}
-                      />
-                    </label>
-                    <label htmlFor='price'>
-                      Price
-                      <input
-                        type='number'
-                        id='price'
-                        name='price'
-                        required
-                        defaultValue={data.item.price}
-                        onChange={this.handleChange}
-                      />
-                    </label>
+  console.log(item);
+  const [title, setTitle] = useState(item.title);
+  const [price, setPrice] = useState(item.price);
+  const [description, setDescription] = useState(item.description);
 
-                    <label htmlFor='description'>
-                      Description
-                      <textarea
-                        id='description'
-                        name='description'
-                        placeholder='Enter a description'
-                        required
-                        defaultValue={data.item.description}
-                        onChange={this.handleChange}
-                      />
-                    </label>
-                    <button type='submit'>Submit</button>
-                  </fieldset>
-                </Form>
-              )}
-            </Mutation>
-          );
-        }}
-      </Query>
-    );
-  }
-}
+  return (
+    <Form onSubmit={e => update(e, updateItem)}>
+      <Error error={error} />
+      <fieldset disabled={loading} aria-busy={loading}>
+        <label htmlFor='title'>
+          Title
+          <input
+            type='text'
+            id='title'
+            name='title'
+            placeholder='Title'
+            required
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+          />
+        </label>
+        <label htmlFor='price'>
+          Price
+          <input
+            type='number'
+            id='price'
+            name='price'
+            required
+            value={price}
+            onChange={e => setPrice(parseFloat(e.target.value))}
+          />
+        </label>
+
+        <label htmlFor='description'>
+          Description
+          <textarea
+            id='description'
+            name='description'
+            placeholder='Enter a description'
+            required
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+          />
+        </label>
+        <button type='submit'>Submit</button>
+      </fieldset>
+    </Form>
+  );
+};
 
 export default UpdateItem;
